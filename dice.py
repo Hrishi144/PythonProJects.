@@ -1,3 +1,11 @@
+"""
+Dice Rolling Program in Python
+
+This program simulates rolling a dice. 
+When executed, it generates a random number between 1 and 6, simulating the rolling of a standard six-sided dice.
+The user can roll the dice multiple times by choosing to continue.
+"""
+
 import random
 
 def roll_dice():
