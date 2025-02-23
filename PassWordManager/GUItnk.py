@@ -77,26 +77,29 @@ def save_password():
  else:
     messagebox.showwarning("Error","All fields are required!")  
 def get_password():
-   website=website_entry.get().strip()
-   if not website:
-      messagebox.showwarning("Error"," Website is required!")
-      return
-   connection =sqlite3.connect("Passwords.db")
-   cursor=connection.cursor()
-   cursor.execute("SELECT Username,Password FROM Passwords WHERE website = ?",(website,))
-   result=cursor.fetchone()
-   connection.close()
-   if result:
-      username,encrypted_password=result
-      try:
-         decrypted_password=decrypt_password(encrypted_password)
-         messagebox.showinfo("Password Details",f"Username::{username}\nwebsite::{website}\nPasssword::{decrypted_password}")
-      except Exception as e:
-         messagebox.showerror("ERROR"," failed to decrypt password!")
-   else:
-      messagebox.showwarning("Not found"," No details found for the website!")
+    website = website_entry.get().strip()
+    username = username_entry.get().strip()
 
-   
+    if not website or not username:
+        messagebox.showwarning("Error", "Both Website and Username are required!")
+        return
+
+    connection = sqlite3.connect("Passwords.db")
+    cursor = connection.cursor()
+    cursor.execute("SELECT ID, Password FROM Passwords WHERE Website = ? AND Username = ?", (website, username))
+    results = cursor.fetchall()
+    connection.close()
+    if results:
+        output = ""
+        for record in results:
+            record_id, encrypted_password = record
+            if isinstance(encrypted_password, str):
+                encrypted_password = encrypted_password.encode()
+            decrypted_password = decrypt_password(encrypted_password)
+            output += f"ID: {record_id}\nPassword: {decrypted_password}\n\n"
+        messagebox.showinfo("Retrieved Data", f"Website: {website}\nUsername: {username}\n\n{output}")
+    else:
+        messagebox.showwarning("Not Found", "No details found for that website and username!")
 
 
 save_button=tk.Button(root,text="save password",command=save_password)
